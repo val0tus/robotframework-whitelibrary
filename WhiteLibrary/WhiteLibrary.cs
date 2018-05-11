@@ -18,14 +18,9 @@ using TestStack.White.UIItems.TabItems;
 
 namespace CSWhiteLibrary
 {
-    public class Keywords : WhiteFW
+	public partial class Keywords : WhiteFW
     {
         private Application app;
-
-        public void launch_application(string sut)
-        {
-            this.app = Application.Launch(sut);
-        }
 
         public void attach_window(string window)
         {
