@@ -19,39 +19,12 @@ namespace WhiteLibrary
 {
     public class WhiteFW
     {
-        protected Window window;
 
         private Dictionary<string, string> strategies = new Dictionary<string, string>
         {
             {"id", "ByAutomationId"},
             {"text", "ByText"},
         };
-
-        protected void set_logging(string level)
-        {
-            switch (level.ToLower())
-            {
-                case "info":
-                    CoreAppXmlConfiguration.Instance.LoggerFactory = new WhiteDefaultLoggerFactory(LoggerLevel.Info);
-                    break;
-                case "warn":
-                    CoreAppXmlConfiguration.Instance.LoggerFactory = new WhiteDefaultLoggerFactory(LoggerLevel.Warn);
-                    break;
-                case "debug":
-                    CoreAppXmlConfiguration.Instance.LoggerFactory = new WhiteDefaultLoggerFactory(LoggerLevel.Debug);
-                    break;
-            }
-        }
-
-        protected TextBox getTextBox(string locator)
-        {
-            return getItemByLocator<TextBox>(locator);
-        }
-
-        protected Slider getSlider(string locator)
-        {
-            return getItemByLocator<Slider>(locator);
-        }
 
         protected Label getLabel(string locator)
         {
@@ -114,7 +87,7 @@ namespace WhiteLibrary
             return tree.Nodes.GetItem(nodePath);
         }
 
-        private T getItemByLocator<T>(string locator) where T : IUIItem
+        protected T getItemByLocator<T>(string locator) where T : IUIItem
         {
             var locatorParts = getLocatorParts(locator);
             string searchStrategy = locatorParts[0];
