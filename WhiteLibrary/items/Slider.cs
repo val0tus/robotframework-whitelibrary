@@ -1,20 +1,35 @@
 ﻿using System;
 using TestStack.White.UIItems;
-using WhiteLibrary;
+using static CsDynamicLib.Attributes;
 
 namespace CSWhiteLibrary.items
 {
-	public partial class Keywords : WhiteFW
+    [RobotKeywordClass]
+    public class SliderKeywords : LibraryElement
     {
-        public void set_slider(string locator, Double myvalue)
+        public SliderKeywords(WhiteLibrary state) : base(state)
+        {
+
+        }
+
+        [RobotKeyword]
+        public bool set_slider(string locator, Double myvalue)
         {
             Slider myslider = getSlider(locator);
             myslider.Value = myvalue;
+            return true;
         }
 
         private Slider getSlider(string locator)
         {
-            return getItemByLocator<Slider>(locator);
+            return State.Finder.getItemByLocator<Slider>(locator);
+        }
+
+        [RobotKeyword]
+        public Double verify_slider(string locator)
+        {
+            Slider mySlider = getSlider(locator);
+            return mySlider.Value;
         }
     }
 }
