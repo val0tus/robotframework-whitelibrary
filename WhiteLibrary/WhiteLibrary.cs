@@ -1,24 +1,32 @@
-﻿using System;
+﻿using CsDynamicLib;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestStack.White;
-using TestStack.White.Factory;
-using TestStack.White.ScreenObjects.Services;
-using TestStack.White.ScreenObjects.Sessions;
-using TestStack.White.UIItems;
-using TestStack.White.UIItems.MenuItems;
-using TestStack.White.UIItems.ListBoxItems;
-using TestStack.White.UIItems.Finders;
 using TestStack.White.UIItems.WindowItems;
-using WhiteLibrary;
-using TestStack.White.UIItems.TreeItems;
-using TestStack.White.UIItems.TabItems;
 
 namespace CSWhiteLibrary
 {
-	public partial class Keywords : WhiteFW
-    {   
+    public class WhiteLibrary : CsLib
+    {
+        public Application App { get; set; }
+        public Window Window { get; set; }
+        public ItemFinder Finder { get; }
+
+        public WhiteLibrary()
+        {
+            LibraryElements = InitializeLibraryElements();
+            Finder = new ItemFinder(this);
+        }
+
+        private List<LibraryElement> InitializeLibraryElements()
+        {
+            var keywordClasses = GetRobotKeywordClasses();
+            var libraryElements = new List<LibraryElement>();
+            foreach (var keywordClass in keywordClasses)
+            {
+                libraryElements.Add((LibraryElement)Activator.CreateInstance(keywordClass, this));
+            }
+            return libraryElements;
+        }
     }
 }

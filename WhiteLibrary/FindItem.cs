@@ -1,155 +1,73 @@
-﻿using System;
-using TestStack.White;
-using WhiteLibrary;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using TestStack.White.UIItems;
+using TestStack.White.UIItems.Finders;
 
 namespace CSWhiteLibrary
 {
-	public partial class Keywords : WhiteFW
+    public class ItemFinder
     {
-        public void input_text_textbox(string locator, string mytext)
+        private WhiteLibrary state;
+        private Dictionary<string, string> strategies = new Dictionary<string, string>
         {
-            TextBox textBox = getTextBox(locator);
-            textBox.Text = mytext;
+            {"id", "ByAutomationId"},
+            {"text", "ByText"},
+        };
+
+        public ItemFinder(WhiteLibrary state)
+        {
+            this.state = state;
         }
 
-        public string verify_text_textbox(string locator)
+        public T getItemByLocator<T>(string locator) where T : IUIItem
         {
-            TextBox textBox = getTextBox(locator);
-            return textBox.Text;
+            var locatorParts = getLocatorParts(locator);
+            string searchStrategy = locatorParts[0];
+            string locatorValue = locatorParts[1];
+
+            if (searchStrategy == "partial_text")
+            {
+                return getItemByPartialText<T>(locatorValue);
+            }
+
+            return getItemBySearchCriteria<T>(searchStrategy, locatorValue);
         }
 
-        public Double verify_slider(string locator)
+        private string[] getLocatorParts(string locator)
         {
-            Slider mySlider = getSlider(locator);
-            return mySlider.Value;
+            if (!locator.Contains("="))
+            {
+                // use automation id as default search strategy if no strategy is defined
+                locator = "id=" + locator;
+            }
+            return locator.Split('=');
         }
 
-        public Double verify_progressbar(string locator)
+        private T getItemByPartialText<T>(string partialText) where T : IUIItem
         {
-            ProgressBar myProgressBar = getProgressBar(locator);
-            return myProgressBar.Value;
+            IUIItem[] items = state.Window.GetMultiple(SearchCriteria.All);
+            return (T)items.First(x => x.GetType() == typeof(T) && x.Name.Contains(partialText));
         }
 
-        public string verify_label(string locator)
+        private T getItemBySearchCriteria<T>(string searchStrategy, string locatorValue) where T : IUIItem
         {
-            Label label = getLabel(locator);
-            return label.Text;
+            SearchCriteria searchCriteria = getSearchCriteria(searchStrategy, locatorValue);
+            return state.Window.Get<T>(searchCriteria);
         }
 
-        public void select_combobox_value(string locator, string value)
+        private SearchCriteria getSearchCriteria(string searchStrategy, string locatorValue)
         {
-            ComboBox comboBox = getComboBox(locator);
-            comboBox.Select(value);
-        }
+            if (searchStrategy == "index")
+            {
+                int index = int.Parse(locatorValue);
+                return SearchCriteria.Indexed(index);
+            }
 
-        public void select_combobox_index(string locator, int index)
-        {
-            ComboBox comboBox = getComboBox(locator);
-            comboBox.Select(index);
+            strategies.TryGetValue(searchStrategy, out string methodName);
+            MethodInfo searchMethod = typeof(SearchCriteria).GetMethod(methodName);
+            var methodParameters = new string[] { locatorValue };
+            return (SearchCriteria)searchMethod.Invoke(null, methodParameters);
         }
-
-        public void select_listbox_value(string locator, string value)
-        {
-            ComboBox listBox = getComboBox(locator);
-            // ListItem listItem = getListItem(value);
-            // listBox.Select(getListItem(value).ToString());
-        }
-
-        public string verify_listbox_value(string locator, string value)
-        {
-            ListBox listBox = getListBox(locator);
-            return listBox.SelectedItemText;
-        }
-
-        public string verify_combobox_item(string locator)
-        {
-            ComboBox comboBox = getComboBox(locator);
-            return comboBox.EditableText;
-        }
-
-        public string verify_button(string locator)
-        {
-            Button button = getButton(locator);
-            return button.Text;
-        }
-
-        public void click_button(string locator)
-        {
-            Button button = getButton(locator);
-            button.Click();
-        }
-
-        public void select_radio_button(string locator)
-        {
-            RadioButton radio_button = getRadioButton(locator);
-            radio_button.Select();
-        }
-
-        public Boolean verify_radio_button(string locator)
-        {
-            RadioButton radio_button = getRadioButton(locator);
-            return radio_button.IsSelected;
-        }
-
-        public Boolean verify_check_box(string locator)
-        {
-            CheckBox check_box = getCheckBox(locator);
-            return check_box.IsSelected;
-        }
-
-        public void toggle_check_box(string locator)
-        {
-            CheckBox check_box = getCheckBox(locator);
-            check_box.Toggle();
-        }
-
-        public string verify_menu(string locator)
-        {
-            Menu menu = getMenu(locator);
-            return menu.Name;
-        }
-
-        public void click_menu_button(string locator)
-        {
-            Menu menu = getMenu(locator);
-            menu.Click();
-        }
-
-        public void select_modal_window(string locator)
-        {
-            List<Window> modalWindows = window.ModalWindows();
-            this.window = window.ModalWindow(locator);
-        }
-
-        public void selectTabPage(string locator, string tabTitle)
-        {
-            Tab tab = getTab(locator);
-            tab.SelectTabPage(tabTitle);
-        }
-
-        public void selectTreeNode(string locator, string[] nodePath)
-        {
-            TreeNode node = getTreeNode(locator, nodePath);
-            node.Select();
-        }
-
-        public void expandTreeNode(string locator, string[] nodePath)
-        {
-            TreeNode node = getTreeNode(locator, nodePath);
-            node.Expand();
-        }
-
-        public void doubleClickTreeNode(string locator, string[] nodePath)
-        {
-            TreeNode node = getTreeNode(locator, nodePath);
-            node.DoubleClick();
-        }
-
-        public void rightClickTreeNode(string locator, string[] nodePath)
-        {
-            TreeNode node = getTreeNode(locator, nodePath);
-            node.RightClick();
-        }
-
     }
 }

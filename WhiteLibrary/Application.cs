@@ -1,21 +1,28 @@
 ﻿using System;
 using TestStack.White;
-using WhiteLibrary;
+using static CsDynamicLib.Attributes;
 
 namespace CSWhiteLibrary
 {
-	public partial class Keywords : WhiteFW
+    [RobotKeywordClass]
+    public class ApplicationKeywords : LibraryElement
     {
-        private Application app;
-
-        public void launch_application(string sut)
+        public ApplicationKeywords(WhiteLibrary state) : base(state)
         {
-            app = Application.Launch(sut);
+        }
+    
+        [RobotKeyword]
+        public bool launchApplication(string sut)
+        {
+            State.App = Application.Launch(sut);
+            return true;
         }
 
-        public void close_application()
+        [RobotKeyword]
+        public bool closeApplication()
         {
-            app.Close();
+            State.App.Close();
+            return true;
         }
     }
 }

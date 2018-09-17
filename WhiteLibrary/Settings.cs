@@ -1,16 +1,23 @@
 ﻿using Castle.Core.Logging;
 using System;
-using TestStack.White;
 using TestStack.White.Configuration;
-using WhiteLibrary;
+using static CsDynamicLib.Attributes;
 
 namespace CSWhiteLibrary
 {
-	public partial class Keywords : WhiteFW
+    [RobotKeywordClass]
+    public class SettingsKeywords : LibraryElement
     {
-        public void set_log_level(string level)
+
+        public SettingsKeywords(WhiteLibrary state) : base(state)
+        {
+        }
+
+        [RobotKeyword]
+        public bool set_logging_level(string level)
         {
             set_logging(level);
+            return true;
         }
 
         private void set_logging(string level)

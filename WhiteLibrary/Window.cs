@@ -1,18 +1,27 @@
-﻿using System;
-using TestStack.White;
+﻿using System.Collections.Generic;
 using TestStack.White.UIItems.WindowItems;
-using WhiteLibrary;
+using static CsDynamicLib.Attributes;
 
 namespace CSWhiteLibrary
 {
-	public partial class Keywords : WhiteFW
+    [RobotKeywordClass]
+    public class WindowKeywords : LibraryElement
     {
-        private Window window;
-
-        public void attach_window(string window)
+        public WindowKeywords(WhiteLibrary state) : base(state)
         {
-            this.window = app.GetWindow(window);
         }
 
+        [RobotKeyword]
+        public void attach_window(string window)
+        {
+            State.Window = State.App.GetWindow(window);
+        }
+
+        [RobotKeyword]
+        public void select_modal_window(string locator)
+        {
+            List<Window> modalWindows = State.Window.ModalWindows();
+            State.Window = State.Window.ModalWindow(locator);
+        }
     }
 }

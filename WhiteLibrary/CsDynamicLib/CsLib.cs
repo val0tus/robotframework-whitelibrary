@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CSWhiteLibrary;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using static CsDynamicLib.Attributes;
 
@@ -7,6 +9,8 @@ namespace CsDynamicLib
 {
     public class CsLib
     {
+        protected List<LibraryElement> LibraryElements { get; set; }
+
         public dynamic RunKeyword(string keyword, params object[] args)
         {
             foreach (Type type in GetRobotKeywordClasses())
@@ -17,8 +21,15 @@ namespace CsDynamicLib
                     {
                         var expectedArgs = method.GetParameters();
                         args = HandleDefaultValuesAndVarArgs(args, expectedArgs);
-                        var instance = Activator.CreateInstance(type);
-                        return method.Invoke(instance, args);
+                        var instance = LibraryElements.First(x => x.GetType() == type);
+                        try
+                        {
+                            var result = method.Invoke(instance, args);
+                            return result;
+                        } catch (TargetInvocationException e)
+                        {
+                            throw e.InnerException;
+                        }
                     }
                 }
             }
@@ -47,7 +58,7 @@ namespace CsDynamicLib
             var type = Array.Find(types, t => t.GetMethod(keywordName) != null);
             MethodInfo method = type.GetMethod(keywordName);
             ParameterInfo[] methodParams = method.GetParameters();
-            ParameterInfo info = methodParams[0];
+          
             List<string> keywordArgs = new List<string>();
             foreach (var param in methodParams)
             {
@@ -66,7 +77,7 @@ namespace CsDynamicLib
             return keywordArgs;
         }
 
-        private IEnumerable<Type> GetRobotKeywordClasses()
+        protected IEnumerable<Type> GetRobotKeywordClasses()
         {
             var assembly = Assembly.GetExecutingAssembly();
             foreach (Type type in assembly.GetTypes())
@@ -80,15 +91,21 @@ namespace CsDynamicLib
 
         private object[] HandleDefaultValuesAndVarArgs(object[] args, ParameterInfo[] expectedArgs)
         {
+            if (expectedArgs.Length == 0)
+            {
+                return args;
+            }
+
             ParameterInfo lastExpectedArg = expectedArgs[expectedArgs.Length - 1];
 
             if (args.Length < expectedArgs.Length)
             {
-                args = PopulateMissingOptionalArgs(args, expectedArgs, lastExpectedArg);
+                return PopulateMissingOptionalArgs(args, expectedArgs, lastExpectedArg);
             }
-            else if (args.Length >= expectedArgs.Length && IsParamArray(lastExpectedArg))
+
+            if (args.Length >= expectedArgs.Length && IsParamArray(lastExpectedArg))
             {
-                args = MoveVarArgsToArray(args, expectedArgs, lastExpectedArg);
+                return MoveVarArgsToArray(args, expectedArgs, lastExpectedArg);
             }
 
             return args;

@@ -64,7 +64,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WhiteFramework.cs" />
+    <Compile Include="CsDynamicLib\Attributes.cs" />
+    <Compile Include="CsDynamicLib\CsLib.cs" />
+    <Compile Include="items\ListBox.cs" />
+    <Compile Include="items\Menu.cs" />
+    <Compile Include="LibraryElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WhiteLibrary.cs" />
     <Compile Include="Application.cs" />
@@ -73,7 +77,6 @@
     <Compile Include="items\Button.cs" />
     <Compile Include="items\RadioButton.cs" />
     <Compile Include="items\CheckBox.cs" />
-    <Compile Include="items\ListItem.cs" />
     <Compile Include="items\ComboBox.cs" />
     <Compile Include="items\Tab.cs" />
     <Compile Include="items\TreeNode.cs" />
@@ -86,9 +89,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="items\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

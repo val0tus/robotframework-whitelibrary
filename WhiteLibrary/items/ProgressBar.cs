@@ -1,10 +1,28 @@
 ﻿using System;
-using WhiteLibrary;
+using TestStack.White.UIItems;
+using static CsDynamicLib.Attributes;
 
 namespace CSWhiteLibrary.items
 {
-	public partial class Keywords : WhiteFW
+    [RobotKeywordClass]
+    public class ProgressBarKeywords : LibraryElement
     {
-       
+        public ProgressBarKeywords(WhiteLibrary state) : base(state)
+        {
+
+        }
+
+        [RobotKeyword]
+        public Double verify_progressbar(string locator)
+        {
+            ProgressBar myProgressBar = getProgressBar(locator);
+            return myProgressBar.Value;
+        }
+
+        private ProgressBar getProgressBar(string locator)
+        {
+            return State.Finder.getItemByLocator<ProgressBar>(locator);
+        }
+
     }
 }
